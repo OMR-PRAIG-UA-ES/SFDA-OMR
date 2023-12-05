@@ -9,6 +9,9 @@ from lightning.pytorch import Trainer
 from lightning.pytorch.loggers.wandb import WandbLogger
 from torch.utils.data import DataLoader
 
+from my_utils.dataset import DS_CONFIG, CTCDataset
+from networks.model import CTCTrainedCRNN
+
 # Seed
 random.seed(42)
 np.random.seed(42)
@@ -18,60 +21,49 @@ torch.manual_seed(42)
 torch.backends.cudnn.benchmark = False
 torch.backends.cudnn.deterministic = True
 
-from my_utils.dataset import DS_CONFIG, CTCDataset
-from networks.model import CTCTrainedCRNN
-
 
 def test(
     train_ds_name,
     test_ds_name,
     checkpoint_path,
-    lowercase=False,
-    project="Unsupervised-Adaptation-Word-HTR",
+    project="AMD-OMR",
     group="Baseline-LowerBound",
 ):
     gc.collect()
     torch.cuda.empty_cache()
 
-    # Check if multi-source setting
-    train_ds_name = "_".join(train_ds_name.split(" "))
-
     # Check if checkpoint path exists
     if not os.path.exists(checkpoint_path):
         raise FileNotFoundError(f"Checkpoint path {checkpoint_path} does not exist")
 
+    # Check if datasets exist
+    if not train_ds_name in DS_CONFIG.keys():
+        raise NotImplementedError(f"Train dataset {train_ds_name} not implemented")
+    if not test_ds_name in DS_CONFIG.keys():
+        raise NotImplementedError(f"Test dataset {test_ds_name} not implemented")
+
     # Experiment info
-    print("Running experiment: Baseline-LowerBound")
+    print(f"Running experiment: {project} - {group}")
     print(f"\tTest dataset: {test_ds_name}")
     print(f"\tCheckpoint path ({train_ds_name}): {checkpoint_path}")
-    print(f"\tLowercase: {lowercase}")
 
     # Dataset
-    if test_ds_name in DS_CONFIG.keys() and "synthetic_words" not in test_ds_name:
-        test_ds = CTCDataset(
-            name=test_ds_name,
-            img_folder_path=DS_CONFIG[test_ds_name]["test"],
-            transcripts_file=DS_CONFIG[test_ds_name]["transcripts"],
-            lowercase=lowercase,
-            train=False,
-        )
-        test_loader = DataLoader(
-            test_ds, batch_size=1, shuffle=False, num_workers=20
-        )  # prefetch_factor=2
-    else:
-        raise NotImplementedError("Dataset not implemented")
+    test_ds = CTCDataset(
+        name=test_ds_name,
+        img_folder_path=DS_CONFIG[test_ds_name]["test"],
+        transcripts_file=DS_CONFIG[test_ds_name]["transcripts"],
+        train=False,
+    )
+    test_loader = DataLoader(
+        test_ds, batch_size=1, shuffle=False, num_workers=20
+    )  # prefetch_factor=2
 
     # Model
     model = CTCTrainedCRNN.load_from_checkpoint(checkpoint_path, ytest_i2w=test_ds.i2w)
     model.freeze()
 
-    # Compute forbidden characters
-    model.compute_forbidden_chars()
-    print(f"\tForbidden characters: {model.forbidden_chars}")
-
     # Test: automatically auto-loads the best weights from the previous run
     run_name = f"Train-{train_ds_name}_Test-{test_ds_name}"
-    run_name += "_lowercase" if lowercase else ""
     trainer = Trainer(
         logger=WandbLogger(
             project=project,

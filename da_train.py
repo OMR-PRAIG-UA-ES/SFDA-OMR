@@ -31,113 +31,103 @@ def da_train(
     checkpoint_path,
     # Training hyperparameters
     bn_ids,
-    sim_loss_weight,
-    cov_loss_weight,
-    var_loss_weight,
+    align_loss_weight,
+    minimize_loss_weight,
+    diversify_loss_weight,
     lr,
     epochs,
     patience,
     batch_size,
-    lowercase=False,
-    metric_to_monitor="val_cer",
-    project="Unsupervised-Adaptation-Word-HTR",
+    # Callbacks
+    metric_to_monitor="val_ser",
+    project="AMD-OMR",
     group="Source-Free-Adaptation",
     delete_checkpoint=False,
 ):
     gc.collect()
     torch.cuda.empty_cache()
 
-    # BN identifiers
-    try:
-        # Multiple BN identifiers; ex.: --bn_ids "1 5"
-        bn_ids = [int(bn_id) for bn_id in bn_ids.split(" ")]
-    except:
-        # Single BN identifier; ex.: --bn_ids "1"
-        bn_ids = [int(bn_ids)]
-
-    # Check if multi-source setting
-    train_ds_name = "_".join(train_ds_name.split(" "))
-
     # Check if checkpoint path exists
     if not os.path.exists(checkpoint_path):
         raise FileNotFoundError(f"Checkpoint path {checkpoint_path} does not exist")
 
+    # Check if datasets exist
+    if not train_ds_name in DS_CONFIG.keys():
+        raise NotImplementedError(f"Train dataset {train_ds_name} not implemented")
+    if not test_ds_name in DS_CONFIG.keys():
+        raise NotImplementedError(f"Test dataset {test_ds_name} not implemented")
+
     # Experiment info
-    print("Running experiment: Source-Free-Adaptation")
+    print(f"Running experiment: {project} - {group}")
     print(f"\tSource model ({train_ds_name}): {checkpoint_path}")
     print(f"\tTarget dataset: {test_ds_name}")
-    print(f"\tLowercase: {lowercase}")
     print(f"\tBN identifiers: {bn_ids}")
-    print(
-        f"\tLoss weights factors: sim_loss_weight={sim_loss_weight}, cov_loss_weight={cov_loss_weight}, var_loss_weight={var_loss_weight}"
-    )
+    print("\tLoss weights factors:")
+    print(f"\t\talign_loss_weight={align_loss_weight}")
+    print(f"\t\tminimize_loss_weight={minimize_loss_weight}")
+    print(f"\t\tdiversify_loss_weight={diversify_loss_weight}")
     print(f"\tLearning rate: {lr}")
     print(f"\tEpochs: {epochs}")
     print(f"\tPatience: {patience}")
     print(f"\tMetric to monitor: {metric_to_monitor}")
 
-    # Dataset
-    if test_ds_name in DS_CONFIG.keys() and "synthetic_words" not in test_ds_name:
-        # Get dataset
-        train_ds = CTCDataset(
-            name=test_ds_name,
-            img_folder_path=DS_CONFIG[test_ds_name]["train"],
-            transcripts_file=DS_CONFIG[test_ds_name]["transcripts"],
-            lowercase=lowercase,
-            train=False,
-            da_train=True,
-        )
-        val_ds = CTCDataset(
-            name=test_ds_name,
-            img_folder_path=DS_CONFIG[test_ds_name]["val"],
-            transcripts_file=DS_CONFIG[test_ds_name]["transcripts"],
-            lowercase=lowercase,
-            train=False,
-        )
-        test_ds = CTCDataset(
-            name=test_ds_name,
-            img_folder_path=DS_CONFIG[test_ds_name]["test"],
-            transcripts_file=DS_CONFIG[test_ds_name]["transcripts"],
-            lowercase=lowercase,
-            train=False,
-        )
-        # Create dataloaders
-        train_loader = DataLoader(
-            train_ds,
-            batch_size=batch_size,
-            shuffle=True,
-            num_workers=20,
-            collate_fn=pad_batch_images,
-        )  # prefetch_factor=2
-        val_loader = DataLoader(
-            val_ds, batch_size=1, shuffle=False, num_workers=20
-        )  # prefetch_factor=2
-        test_loader = DataLoader(
-            test_ds, batch_size=1, shuffle=False, num_workers=20
-        )  # prefetch_factor=2
-    else:
-        raise NotImplementedError("Dataset not implemented")
+    # Get dataset
+    train_ds = CTCDataset(
+        name=test_ds_name,
+        img_folder_path=DS_CONFIG[test_ds_name]["train"],
+        transcripts_file=DS_CONFIG[test_ds_name]["transcripts"],
+        train=False,
+        da_train=True,
+    )
+    train_loader = DataLoader(
+        train_ds,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=20,
+        collate_fn=pad_batch_images,
+    )  # prefetch_factor=2
+    val_ds = CTCDataset(
+        name=test_ds_name,
+        img_folder_path=DS_CONFIG[test_ds_name]["val"],
+        transcripts_file=DS_CONFIG[test_ds_name]["transcripts"],
+        train=False,
+    )
+    val_loader = DataLoader(
+        val_ds, batch_size=1, shuffle=False, num_workers=20
+    )  # prefetch_factor=2
+    test_ds = CTCDataset(
+        name=test_ds_name,
+        img_folder_path=DS_CONFIG[test_ds_name]["test"],
+        transcripts_file=DS_CONFIG[test_ds_name]["transcripts"],
+        train=False,
+    )
+    test_loader = DataLoader(
+        test_ds, batch_size=1, shuffle=False, num_workers=20
+    )  # prefetch_factor=2
 
     # Model
+    bn_ids = [bn_ids] if type(bn_ids) == int else bn_ids
     model = DATrainedCRNN(
         src_checkpoint_path=checkpoint_path, ytest_i2w=train_ds.i2w, bn_ids=bn_ids
     )
     model_name = f"Train-{train_ds_name}_Test-{test_ds_name}"
-    model_name += "_lowercase" if lowercase else ""
-    model_name += f"_lr{lr}_bn{'-'.join([str(bn_id) for bn_id in bn_ids])}_s{sim_loss_weight}_c{cov_loss_weight}_v{var_loss_weight}"
+    model_name += f"_lr{lr}_bn{'-'.join([str(bn_id) for bn_id in bn_ids])}"
+    model_name += (
+        f"_a{align_loss_weight}_m{minimize_loss_weight}_d{diversify_loss_weight}"
+    )
 
     # Loss
     model.configure_da_loss(
         lr=lr,
-        sim_loss_weight=sim_loss_weight,
-        cov_loss_weight=cov_loss_weight,
-        var_loss_weight=var_loss_weight,
+        align_loss_weight=align_loss_weight,
+        minimize_loss_weight=minimize_loss_weight,
+        diversify_loss_weight=diversify_loss_weight,
     )
 
     # Train and validate
     callbacks = [
         ModelCheckpoint(
-            dirpath="weights/Source-Free-Adaptation",
+            dirpath=f"weights/{group}",
             filename=model_name,
             monitor=metric_to_monitor,
             verbose=True,
@@ -178,15 +168,13 @@ def da_train(
     trainer.fit(model, train_dataloaders=train_loader, val_dataloaders=val_loader)
 
     # Test
-    model = DATrainedCRNN.load_from_checkpoint(
-        f"weights/Source-Free-Adaptation/{model_name}.ckpt"
-    )
+    model = DATrainedCRNN.load_from_checkpoint(f"weights/{group}/{model_name}.ckpt")
     model.freeze()
     trainer.test(model, dataloaders=test_loader)
 
     # Remove checkpoint
     if delete_checkpoint:
-        os.remove(f"weights/Source-Free-Adaptation/{model_name}.ckpt")
+        os.remove(f"weights/{group}/{model_name}.ckpt")
 
 
 if __name__ == "__main__":
