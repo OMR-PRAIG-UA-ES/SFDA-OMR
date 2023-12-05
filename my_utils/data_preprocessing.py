@@ -1,11 +1,11 @@
 import joblib
 
-memory = joblib.memory.Memory("./cache", mmap_mode="r", verbose=0)
-
 import torch
 import torch.nn.functional as F
 from PIL import Image
 from torchvision import transforms
+
+memory = joblib.memory.Memory("./cache", mmap_mode="r", verbose=0)
 
 NUM_CHANNELS = 1
 IMG_HEIGHT = 64
@@ -30,7 +30,7 @@ def preprocess_image_from_file(path, resize=True):
 
 
 def preprocess_transcript(y, w2i):
-    # Ex.: y = "hello"
+    # Ex.: y = ["clef", "note", ...]
     return [w2i[c] for c in y]
 
 
@@ -59,24 +59,3 @@ def ctc_batch_preparation(batch):
     y = pad_batch_transcripts(y)
     yl = torch.tensor(yl, dtype=torch.int32)
     return x, xl, y, yl
-
-
-def ctc_shuffle(batch):
-    x, xl, y, yl = batch
-    indices = torch.randperm(x.shape[0])
-    return x[indices], xl[indices], y[indices], yl[indices]
-
-
-def shuffle(batch):
-    indices = torch.randperm(batch.shape[0])
-    return batch[indices]
-
-
-def multisource_ctc_batch_preparation(batch):
-    batch = [s for b in batch for s in b]
-    return ctc_shuffle(ctc_batch_preparation(batch))
-
-
-def multisource_pad_batch_images(batch):
-    batch = [s for b in batch for s in b]
-    return shuffle(pad_batch_images(batch))
