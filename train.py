@@ -25,9 +25,9 @@ torch.backends.cudnn.deterministic = True
 
 def train(
     ds_name,
-    epochs,
-    patience,
-    batch_size,
+    epochs=1000,
+    patience=20,
+    batch_size=16,
     use_augmentations=True,
     metric_to_monitor="val_ser",
     project="AMD-OMR",

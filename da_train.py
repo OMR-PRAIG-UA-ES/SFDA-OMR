@@ -35,9 +35,9 @@ def da_train(
     minimize_loss_weight,
     diversify_loss_weight,
     lr,
-    epochs,
-    patience,
-    batch_size,
+    epochs=1000,
+    patience=20,
+    batch_size=16,
     # Callbacks
     metric_to_monitor="val_ser",
     project="AMD-OMR",
