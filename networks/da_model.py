@@ -7,9 +7,9 @@ from lightning.pytorch import LightningModule
 
 from networks.modules import BN_IDS
 from networks.model import CTCTrainedCRNN
-from networks.da_loss import DomainAdaptationLoss
+from networks.da_loss import AMDLoss
 from my_utils.data_preprocessing import NUM_CHANNELS, IMG_HEIGHT
-from my_utils.metrics import ctc_greedy_decoder, compute_all_metrics
+from my_utils.metrics import ctc_greedy_decoder, compute_metrics
 
 
 class DATrainedCRNN(LightningModule):
@@ -55,14 +55,7 @@ class DATrainedCRNN(LightningModule):
         # 4) Deep copy the source model's dictionaries
         self.w2i = deepcopy(src_model.w2i)
         self.i2w = deepcopy(src_model.i2w)
-        # 5) Compute forbidden characters
-        #  (characters that are in the target vocabulary but not in the source vocabulary)
-        # Source vocabulary is the one known by the model
-        # It was trained on this vocabulary!
-        self.forbidden_chars = [
-            c for c in self.ytest_i2w.values() if c not in self.w2i.keys()
-        ]
-        # 6) Delete the source model
+        # 5) Delete the source model
         for src_param, tgt_param in zip(
             src_model.model.parameters(), self.model.parameters()
         ):
@@ -73,17 +66,21 @@ class DATrainedCRNN(LightningModule):
         print("Source model ready!")
 
     def configure_da_loss(
-        self, lr=3e-4, sim_loss_weight=1.0, cov_loss_weight=1.0, var_loss_weight=1.0
+        self,
+        lr=3e-4,
+        align_loss_weight=1.0,
+        minimize_loss_weight=1.0,
+        diversify_loss_weight=1.0,
     ):
         # 1) Initialize the learning rate
         self.lr = lr
         # 2) Initialize the loss function
-        self.compute_da_loss = DomainAdaptationLoss(
+        self.compute_da_loss = AMDLoss(
             bn_mean=self.bn_mean,
             bn_var=self.bn_var,
-            sim_loss_weight=sim_loss_weight,
-            cov_loss_weight=cov_loss_weight,
-            var_loss_weight=var_loss_weight,
+            align_loss_weight=align_loss_weight,
+            minimize_loss_weight=minimize_loss_weight,
+            diversify_loss_weight=diversify_loss_weight,
         )
 
     def configure_optimizers(self):
@@ -123,7 +120,7 @@ class DATrainedCRNN(LightningModule):
         return self.validation_step(batch, batch_idx)
 
     def on_validation_epoch_end(self, name="val", print_random_samples=False):
-        metrics = compute_all_metrics(self.Y, self.YHat, self.forbidden_chars)
+        metrics = compute_metrics(y_true=self.Y, y_pred=self.YHat)
         for k, v in metrics.items():
             self.log(f"{name}_{k}", v, prog_bar=True, logger=True, on_epoch=True)
         # Print random samples

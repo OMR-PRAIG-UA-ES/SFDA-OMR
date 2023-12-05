@@ -7,14 +7,12 @@ from torchinfo import summary
 
 from my_utils.augmentations import AugmentStage
 from my_utils.data_preprocessing import IMG_HEIGHT, NUM_CHANNELS
-from my_utils.metrics import compute_all_metrics, ctc_greedy_decoder
+from my_utils.metrics import compute_metrics, ctc_greedy_decoder
 from networks.modules import CRNN
 
 
 class CTCTrainedCRNN(LightningModule):
-    def __init__(
-        self, w2i, i2w, use_augmentations=True, ytest_i2w=None, forbidden_chars=[]
-    ):
+    def __init__(self, w2i, i2w, use_augmentations=True, ytest_i2w=None):
         super(CTCTrainedCRNN, self).__init__()
         # Save hyperparameters
         self.save_hyperparameters()
@@ -22,7 +20,6 @@ class CTCTrainedCRNN(LightningModule):
         self.w2i = w2i
         self.i2w = i2w
         self.ytest_i2w = ytest_i2w if ytest_i2w is not None else i2w
-        self.forbidden_chars = forbidden_chars
         # Model
         self.model = CRNN(output_size=len(self.w2i) + 1)
         self.summary()
@@ -35,13 +32,6 @@ class CTCTrainedCRNN(LightningModule):
         # Predictions
         self.Y = []
         self.YHat = []
-
-    def compute_forbidden_chars(self):
-        # Characters that are in the test (target) vocabulary but not in the train (source) vocabulary
-        # Train (source) vocabulary is the one known by the model
-        self.forbidden_chars = [
-            c for c in self.ytest_i2w.values() if c not in self.w2i.keys()
-        ]
 
     def summary(self):
         summary(self.model, input_size=[1, NUM_CHANNELS, IMG_HEIGHT, 256])
@@ -81,7 +71,7 @@ class CTCTrainedCRNN(LightningModule):
         return self.validation_step(batch, batch_idx)
 
     def on_validation_epoch_end(self, name="val", print_random_samples=False):
-        metrics = compute_all_metrics(self.Y, self.YHat, self.forbidden_chars)
+        metrics = compute_metrics(y_true=self.Y, y_pred=self.YHat)
         for k, v in metrics.items():
             self.log(f"{name}_{k}", v, prog_bar=True, logger=True, on_epoch=True)
         # Print random samples
