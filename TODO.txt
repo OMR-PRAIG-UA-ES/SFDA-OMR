@@ -1,0 +1,37 @@
+- data:
+    - aquí yo tenía una carpeta para cada dataset. iam tenía su carpeta y dentro 
+    estaban los datos y también un .py para parsearlos y cómo hacerlo. ahora ya es 
+    cómo mejor te cuadre para los datasets que vamos a usar. te he dejado el config.py
+    para que veas como tenía estructurado yo las cosas. ese config.py es el que se le pasa
+    a la clase dataset (mira train.py para ver un ejemplo)
+
+- my_utils:
+    - augmentations: probar si son las adecuadas para OMR. se usan únicamente 
+    durante el entrenamiento del moodel source (train.py)
+    - data_preprocessing: creo que deberían funcionar para OMR.
+    - dataset: está es la que tocará adaptar entera para los datos de OMR.
+    - metrics: he dejado solo por ahora el ser, que creo que es suficiente así.
+    de todas formas, cuando sepamos el tipo de codificación que vamos a usar, lo vemos
+    y añado el greedy decoder que tienen en cuenta la estructura de la secuencia.
+
+- networks:
+    - he borrado todo lo que era propio de HTR, así que debería ir sin problema.
+    - hay una cosa que en su momento no conseguí hacer funcionar. el da_model.py 
+    usa un montón de funciones EXACTAMENTE iguales que el model.py pero me daba 
+    problemas la herencia. están marcadas con una NOTE. si consigues arreglarlo, 
+    genial porque así nos quitamos código redudandte y nos aseguramos que son las
+    mismas funciones.
+
+- train.py, test.py, da_train.py
+    - he borrado todo lo que era propio de HTR.
+    - habrá que adaptarlas al dataset que se cree para OMR. ahora mismo he dejado esa
+    clase generica y el uso del config.py de data
+
+- Dockerfile y requirements
+    - contiene por ahora los necesarios aunque el Dockerfile instala el pybind por si 
+    luego calculamos otras métricas como las que hemos calculado para HTR
+
+- run_experiments.sh
+    - te he dejado ejemplos de como lanzar los ficheros. con fire cuando quieras pasar una
+    lista como argumento separa los elementos por comas y no dejes espacios. así fire los captura
+    como tupla.

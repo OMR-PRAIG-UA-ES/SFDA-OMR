@@ -15,13 +15,12 @@ toTensor = transforms.ToTensor()
 
 
 @memory.cache
-def preprocess_image_from_file(path, resize=True):
+def preprocess_image_from_file(path):
     x = Image.open(path).convert("L")  # Convert to grayscale
-    if resize:
-        new_width = int(
-            IMG_HEIGHT * x.size[0] / x.size[1]
-        )  # Get width preserving aspect ratio
-        x = x.resize((new_width, IMG_HEIGHT))  # Resize
+    new_width = int(
+        IMG_HEIGHT * x.size[0] / x.size[1]
+    )  # Get width preserving aspect ratio
+    x = x.resize((new_width, IMG_HEIGHT))  # Resize
     x = toTensor(x)  # Convert to tensor (normalizes to [0, 1])
     return x
 
