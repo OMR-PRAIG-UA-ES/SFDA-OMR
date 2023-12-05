@@ -1,9 +1,5 @@
 torchvision
-fastwer
 lightning
 torchinfo
 fire
 wandb
-scikit-learn
-edit_distance
-fonttools
