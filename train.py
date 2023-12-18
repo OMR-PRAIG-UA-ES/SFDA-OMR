@@ -10,7 +10,8 @@ from lightning.pytorch.loggers.wandb import WandbLogger
 from torch.utils.data import DataLoader
 
 from my_utils.data_preprocessing import ctc_batch_preparation
-from my_utils.dataset import DS_CONFIG, CTCDataset
+from my_utils.dataset import CTCDataset
+from data.config import DS_CONFIG
 from networks.model import CTCTrainedCRNN
 
 # Seed
@@ -37,6 +38,7 @@ def train(
     torch.cuda.empty_cache()
 
     # Check if dataset exists
+    print("dsname", ds_name)
     if not ds_name in DS_CONFIG.keys():
         raise NotImplementedError(f"Dataset {ds_name} not implemented")
 
@@ -52,7 +54,8 @@ def train(
     train_ds = CTCDataset(
         name=ds_name,
         img_folder_path=DS_CONFIG[ds_name]["train"],
-        transcripts_file=DS_CONFIG[ds_name]["transcripts"],
+        transcripts_folder=DS_CONFIG[ds_name]["transcripts"],
+        img_folder=DS_CONFIG[ds_name]["images"],
     )
     train_loader = DataLoader(
         train_ds,
@@ -64,7 +67,8 @@ def train(
     val_ds = CTCDataset(
         name=ds_name,
         img_folder_path=DS_CONFIG[ds_name]["val"],
-        transcripts_file=DS_CONFIG[ds_name]["transcripts"],
+        transcripts_folder=DS_CONFIG[ds_name]["transcripts"],
+        img_folder=DS_CONFIG[ds_name]["images"],
         train=False,
     )
     val_loader = DataLoader(
@@ -73,7 +77,8 @@ def train(
     test_ds = CTCDataset(
         name=ds_name,
         img_folder_path=DS_CONFIG[ds_name]["test"],
-        transcripts_file=DS_CONFIG[ds_name]["transcripts"],
+        transcripts_folder=DS_CONFIG[ds_name]["transcripts"],
+        img_folder=DS_CONFIG[ds_name]["images"],
         train=False,
     )
     test_loader = DataLoader(

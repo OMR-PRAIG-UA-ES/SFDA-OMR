@@ -363,6 +363,9 @@ data/synthetic_words_real/words
 data/synthetic_words_random/words
 data/synthetic_words_wiki/words
 
+# Data OMR
+data/b-59-850
+
 # Logs
 *.logs
 joblib_cache/
@@ -371,3 +374,6 @@ weights/
 wandb/
 cache
 results
+
+# Visual Studio Code
+.vscode/

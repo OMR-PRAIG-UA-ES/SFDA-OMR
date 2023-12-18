@@ -1,12 +1,9 @@
-# TODO:
-# Adapt to OMR datasets
-# This is an example of the config dict for HTR datasets
-
 DS_CONFIG = {
-    "iam": {
-        "train": "data/iam/words/trainset",
-        "val": "data/iam/words/validationset1",
-        "test": "data/iam/words/testset",
-        "transcripts": "data/iam/word_transcriptions.txt",
+    "b-59-850": {
+        "train": "data/b-59-850/Folds/train_gt_fold0.dat",
+        "val": "data/b-59-850/Folds/val_gt_fold0.dat",
+        "test": "data/b-59-850/Folds/test_gt_fold0.dat",
+        "transcripts": "data/b-59-850/GT",
+        "images": "data/b-59-850/Images",
     }
 }

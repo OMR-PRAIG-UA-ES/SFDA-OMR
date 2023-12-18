@@ -17,7 +17,8 @@ class CTCDataset(Dataset):
         self,
         name,
         img_folder_path,
-        transcripts_file,
+        transcripts_folder,
+        img_folder,
         train=True,
         da_train=False,
         width_reduction=2,
@@ -29,7 +30,7 @@ class CTCDataset(Dataset):
 
         # Get image paths and transcripts
         self.X, self.Y = self.get_images_and_transcripts(
-            img_folder_path, transcripts_file
+            img_folder_path, img_folder, transcripts_folder
         )
 
         # Check and retrieve vocabulary
@@ -37,7 +38,7 @@ class CTCDataset(Dataset):
         vocab_folder = os.path.join(os.path.join("data", self.name.lower()), "vocab")
         os.makedirs(vocab_folder, exist_ok=True)
         self.w2i_path = os.path.join(vocab_folder, vocab_name)
-        self.w2i, self.i2w = self.check_and_retrieve_vocabulary(transcripts_file)
+        self.w2i, self.i2w = self.check_and_retrieve_vocabulary(transcripts_folder)
 
         # Preprocess transcripts after retrieving vocabulary
         self.Y = self.preprocess_all_transcripts(self.Y)
@@ -62,19 +63,38 @@ class CTCDataset(Dataset):
 
             return x, y
 
-    def get_images_and_transcripts(self, img_folder_path, transcripts_file):
+    def get_images_and_transcripts(self, img_dat_file_path, img_directory, transcripts_directory):
         images = []
         transcripts = []
-        # TODO:
-        # Lo que al final devolvía era una lista con los paths de las imágenes
-        # y otra con las transcripciones de cada imagen porque tenía un fichero
-        # que era word_transcriptions.txt donde cada fila era:
-        # {nombre de la imagen}\t{transcripción}
-        # Todo esto hay que adaptarlo al formato de los datasets que usemos
+        
+        # En el caso de OMR, las imágenes están en un directorio y las transcripciones
+        # en otro. Las transcripciones están en formato agnóstico.
+        # Cada archivo del directorio es la transcripción de la imagen con el mismo
+        # nombre pero en el directorio de imágenes.
+        # El nombre de las transcripciones es:
+        # {nombre de la imagen con su extensión}.txt
+        # Y el formato de cada archivo es:
+        # {transcripción}
+        
+        # Leer el archivo .dat para obtener los nombres de los archivos de imagen
+        with open(img_dat_file_path, 'r') as file:
+            img_files = file.read().splitlines()
+
+        for img_file in img_files:
+            img_path = os.path.join(img_directory, img_file)
+
+            # El nombre del archivo de transcripción incluye la extensión completa de la imagen
+            transcript_file = img_file + '.txt'
+            transcript_path = os.path.join(transcripts_directory, transcript_file)
+
+            if os.path.exists(img_path) and os.path.exists(transcript_path):
+                images.append(img_path)
+                with open(transcript_path, 'r') as file:
+                    transcripts.append(file.read())
 
         return images, transcripts
 
-    def check_and_retrieve_vocabulary(self, transcripts):
+    def check_and_retrieve_vocabulary(self, transcripts_dir):
         w2i = {}
         i2w = {}
 
@@ -83,17 +103,28 @@ class CTCDataset(Dataset):
                 w2i = json.load(file)
             i2w = {v: k for k, v in w2i.items()}
         else:
+            transcripts = self.read_transcripts(transcripts_dir)
             w2i, i2w = self.make_vocabulary(transcripts)
             with open(self.w2i_path, "w") as file:
                 json.dump(w2i, file)
 
         return w2i, i2w
+    
+    def read_transcripts(self, transcripts_dir):
+        transcripts = []
+        for transcript_file in os.listdir(transcripts_dir):
+            with open(os.path.join(transcripts_dir, transcript_file), 'r') as file:
+                transcripts.append(file.read())
+        return transcripts
 
     def make_vocabulary(self, transcripts):
-        vocab = []
+        vocab = set()  # Usamos un conjunto para evitar duplicados
 
-        # TODO:
-        # Retrive vocab!
+        for transcript in transcripts:
+            # Dividir cada transcripción en palabras/tokens
+            words = transcript.split()  # Esto divide el texto por espacios
+            vocab.update(words)  # Añade las palabras al conjunto de vocabulario
+        
         vocab = sorted(vocab)
 
         w2i = {}
@@ -109,5 +140,6 @@ class CTCDataset(Dataset):
     def preprocess_all_transcripts(self, transcripts):
         pre_transcripts = []
         for t in transcripts:
-            pre_transcripts.append(preprocess_transcript(t, self.w2i))
+            tokenized_transcript = t.split()
+            pre_transcripts.append(preprocess_transcript(tokenized_transcript, self.w2i))
         return pre_transcripts
