@@ -1,6 +1,7 @@
 import random
 
 import torch
+import matplotlib.pyplot as plt
 from lightning.pytorch import LightningModule
 from torch.nn import CTCLoss
 from torchinfo import summary
@@ -44,6 +45,8 @@ class CTCTrainedCRNN(LightningModule):
 
     def training_step(self, batch, batch_idx):
         x, xl, y, yl = batch
+        #plt.imshow(x[0].permute(1, 2, 0).detach().cpu().numpy(), cmap="gray")
+        #plt.show()
         x = self.augment(x)
         yhat = self.model(x)
         # ------ CTC Requirements ------
@@ -57,6 +60,8 @@ class CTCTrainedCRNN(LightningModule):
 
     def validation_step(self, batch, batch_idx):
         x, y = batch  # batch_size = 1
+        #plt.imshow(x[0].permute(1, 2, 0).detach().cpu().numpy(), cmap="gray")
+        #plt.show()
         # Model prediction (decoded using the vocabulary on which it was trained)
         yhat = self.model(x)[0]
         yhat = yhat.log_softmax(dim=-1).detach().cpu()

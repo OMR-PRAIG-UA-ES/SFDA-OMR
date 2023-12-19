@@ -132,6 +132,7 @@ def train(
         deterministic=False,  # If True, raises error saying that CTC loss does not have this behaviour
         benchmark=False,
         precision="16-mixed",  # Mixed precision training
+        fast_dev_run=False, # Set to True to check if everything is working
     )
     trainer.fit(model, train_dataloaders=train_loader, val_dataloaders=val_loader)
 

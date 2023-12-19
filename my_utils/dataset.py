@@ -90,7 +90,7 @@ class CTCDataset(Dataset):
             if os.path.exists(img_path) and os.path.exists(transcript_path):
                 images.append(img_path)
                 with open(transcript_path, 'r') as file:
-                    transcripts.append(file.read())
+                    transcripts.append(file.read().split())
 
         return images, transcripts
 
@@ -140,6 +140,5 @@ class CTCDataset(Dataset):
     def preprocess_all_transcripts(self, transcripts):
         pre_transcripts = []
         for t in transcripts:
-            tokenized_transcript = t.split()
-            pre_transcripts.append(preprocess_transcript(tokenized_transcript, self.w2i))
+            pre_transcripts.append(preprocess_transcript(t, self.w2i))
         return pre_transcripts
