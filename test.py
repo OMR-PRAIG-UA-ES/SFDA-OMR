@@ -9,7 +9,8 @@ from lightning.pytorch import Trainer
 from lightning.pytorch.loggers.wandb import WandbLogger
 from torch.utils.data import DataLoader
 
-from my_utils.dataset import DS_CONFIG, CTCDataset
+from data.config import DS_CONFIG
+from my_utils.dataset import CTCDataset
 from networks.model import CTCTrainedCRNN
 
 # Seed
@@ -50,8 +51,9 @@ def test(
     # Dataset
     test_ds = CTCDataset(
         name=test_ds_name,
-        img_folder_path=DS_CONFIG[test_ds_name]["test"],
-        transcripts_file=DS_CONFIG[test_ds_name]["transcripts"],
+        samples_filepath=DS_CONFIG[test_ds_name]["test"],
+        transcripts_folder=DS_CONFIG[test_ds_name]["transcripts"],
+        img_folder=DS_CONFIG[test_ds_name]["images"],
         train=False,
     )
     test_loader = DataLoader(
