@@ -38,7 +38,6 @@ def train(
     torch.cuda.empty_cache()
 
     # Check if dataset exists
-    print("dsname", ds_name)
     if not ds_name in DS_CONFIG.keys():
         raise NotImplementedError(f"Dataset {ds_name} not implemented")
 
@@ -53,7 +52,7 @@ def train(
     # Get datasets
     train_ds = CTCDataset(
         name=ds_name,
-        img_folder_path=DS_CONFIG[ds_name]["train"],
+        samples_filepath=DS_CONFIG[ds_name]["train"],
         transcripts_folder=DS_CONFIG[ds_name]["transcripts"],
         img_folder=DS_CONFIG[ds_name]["images"],
     )
@@ -66,7 +65,7 @@ def train(
     )  # prefetch_factor=2
     val_ds = CTCDataset(
         name=ds_name,
-        img_folder_path=DS_CONFIG[ds_name]["val"],
+        samples_filepath=DS_CONFIG[ds_name]["val"],
         transcripts_folder=DS_CONFIG[ds_name]["transcripts"],
         img_folder=DS_CONFIG[ds_name]["images"],
         train=False,
@@ -76,7 +75,7 @@ def train(
     )  # prefetch_factor=2
     test_ds = CTCDataset(
         name=ds_name,
-        img_folder_path=DS_CONFIG[ds_name]["test"],
+        samples_filepath=DS_CONFIG[ds_name]["test"],
         transcripts_folder=DS_CONFIG[ds_name]["transcripts"],
         img_folder=DS_CONFIG[ds_name]["images"],
         train=False,
@@ -90,13 +89,12 @@ def train(
         w2i=train_ds.w2i, i2w=train_ds.i2w, use_augmentations=use_augmentations
     )
     train_ds.width_reduction = model.model.cnn.width_reduction
-    model_name = ds_name
 
     # Train and validate
     callbacks = [
         ModelCheckpoint(
             dirpath=f"weights/{group}",
-            filename=model_name,
+            filename=ds_name,
             monitor=metric_to_monitor,
             verbose=True,
             save_last=False,
@@ -123,7 +121,7 @@ def train(
         logger=WandbLogger(
             project=project,
             group=group,
-            name=f"Train-{ds_name}_Test-{model_name}",
+            name=f"Train-{ds_name}_Test-{ds_name}",
             log_model=False,
         ),
         callbacks=callbacks,
@@ -132,13 +130,13 @@ def train(
         deterministic=False,  # If True, raises error saying that CTC loss does not have this behaviour
         benchmark=False,
         precision="16-mixed",  # Mixed precision training
-        fast_dev_run=False, # Set to True to check if everything is working
+        fast_dev_run=False,  # Set to True to check if everything is working
     )
     trainer.fit(model, train_dataloaders=train_loader, val_dataloaders=val_loader)
 
     # Test
     model = CTCTrainedCRNN.load_from_checkpoint(
-        f"weights/{group}/{model_name}.ckpt", ytest_i2w=test_ds.i2w
+        f"weights/{group}/{ds_name}.ckpt", ytest_i2w=test_ds.i2w
     )
     model.freeze()
     trainer.test(model, dataloaders=test_loader)
