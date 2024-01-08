@@ -20,8 +20,9 @@ torch.backends.cudnn.benchmark = False
 torch.backends.cudnn.deterministic = True
 
 from my_utils.data_preprocessing import pad_batch_images
-from my_utils.dataset import DS_CONFIG, CTCDataset
+from my_utils.dataset import CTCDataset
 from networks.da_model import DATrainedCRNN
+from data.config import DS_CONFIG
 
 
 def da_train(
@@ -74,8 +75,9 @@ def da_train(
     # Get dataset
     train_ds = CTCDataset(
         name=test_ds_name,
-        img_folder_path=DS_CONFIG[test_ds_name]["train"],
-        transcripts_file=DS_CONFIG[test_ds_name]["transcripts"],
+        samples_filepath=DS_CONFIG[test_ds_name]["train"],
+        transcripts_folder=DS_CONFIG[test_ds_name]["transcripts"],
+        img_folder=DS_CONFIG[test_ds_name]["images"],
         train=False,
         da_train=True,
     )
@@ -88,8 +90,9 @@ def da_train(
     )  # prefetch_factor=2
     val_ds = CTCDataset(
         name=test_ds_name,
-        img_folder_path=DS_CONFIG[test_ds_name]["val"],
-        transcripts_file=DS_CONFIG[test_ds_name]["transcripts"],
+        samples_filepath=DS_CONFIG[test_ds_name]["val"],
+        transcripts_folder=DS_CONFIG[test_ds_name]["transcripts"],
+        img_folder=DS_CONFIG[test_ds_name]["images"],
         train=False,
     )
     val_loader = DataLoader(
@@ -97,8 +100,9 @@ def da_train(
     )  # prefetch_factor=2
     test_ds = CTCDataset(
         name=test_ds_name,
-        img_folder_path=DS_CONFIG[test_ds_name]["test"],
-        transcripts_file=DS_CONFIG[test_ds_name]["transcripts"],
+        samples_filepath=DS_CONFIG[test_ds_name]["test"],
+        transcripts_folder=DS_CONFIG[test_ds_name]["transcripts"],
+        img_folder=DS_CONFIG[test_ds_name]["images"],
         train=False,
     )
     test_loader = DataLoader(
