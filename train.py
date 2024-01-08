@@ -38,7 +38,7 @@ def train(
     torch.cuda.empty_cache()
 
     # Check if dataset exists
-    if not ds_name in DS_CONFIG.keys():
+    if ds_name not in DS_CONFIG.keys():
         raise NotImplementedError(f"Dataset {ds_name} not implemented")
 
     # Experiment info
@@ -136,7 +136,7 @@ def train(
 
     # Test
     model = CTCTrainedCRNN.load_from_checkpoint(
-        f"weights/{group}/{ds_name}.ckpt", ytest_i2w=test_ds.i2w
+        callbacks[0].best_model_path, ytest_i2w=test_ds.i2w
     )
     model.freeze()
     trainer.test(model, dataloaders=test_loader)
