@@ -103,12 +103,17 @@ def change_separator():
     # Music symbols consists of two terms: event durationg and pitch
     # In the original dataset, the separator between these two terms is a "-"
     # Changed to ":" to be consistent with the rest of datasets
+    # If "-" is used in after "L" or "S" (and followed by a number), it is not changed
     for f in os.listdir("data/Primus/GT"):
         if f.startswith("."):
             continue
         with open(os.path.join("data/Primus/GT", f), "r") as txt:
             content = txt.read()
+        content = content.replace("L-", "L:")
+        content = content.replace("S-", "S:")
         content = content.replace("-", ":")
+        content = content.replace("L:", "L-")
+        content = content.replace("S:", "S-")
         with open(os.path.join("data/Primus/GT", f), "w") as txt:
             txt.write(content)
 
