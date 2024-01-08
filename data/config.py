@@ -28,27 +28,20 @@ DS_CONFIG = {
         "transcripts": "data/ILS/GT",
         "images": "data/ILS/Images",
     },
-    "primens-Agr-Fry-Ock": {
-        "train": "data/primens-Agr-Fry-Ock/Folds/train_gt_fold0.dat",
-        "val": "data/primens-Agr-Fry-Ock/Folds/val_gt_fold0.dat",
-        "test": "data/primens-Agr-Fry-Ock/Folds/test_gt_fold0.dat",
-        "transcripts": "data/primens-Agr-Fry-Ock/GT",
-        "images": "data/primens-Agr-Fry-Ock/Images",
+    # Modern
+    "Primus": {
+        "train": "data/Primus/Folds/train_gt_fold0.dat",
+        "val": "data/Primus/Folds/val_gt_fold0.dat",
+        "test": "data/Primus/Folds/test_gt_fold0.dat",
+        "transcripts": "data/Primus/GT",
+        "images": "data/Primus/Images",
     },
-    "b-3-28": {
-        "train": "data/b-3-28/Folds/train_gt_fold0.dat",
-        "val": "data/b-3-28/Folds/val_gt_fold0.dat",
-        "test": "data/b-3-28/Folds/test_gt_fold0.dat",
-        "transcripts": "data/b-3-28/GT",
-        "images": "data/b-3-28/Images",
-    },
-    # Moderna
-    "Camera-Primus": {
-        "train": "data/Camera-Primus/Folds/train_gt_fold0.dat",
-        "val": "data/Camera-Primus/Folds/val_gt_fold0.dat",
-        "test": "data/Camera-Primus/Folds/test_gt_fold0.dat",
-        "transcripts": "data/Camera-Primus/GT",
-        "images": "data/Camera-Primus/Images",
+    "CameraPrimus": {
+        "train": "data/Primus/Folds/train_gt_fold0.dat",
+        "val": "data/Primus/Folds/val_gt_fold0.dat",
+        "test": "data/Primus/Folds/test_gt_fold0.dat",
+        "transcripts": "data/Primus/GT",
+        "images": "data/CameraPrimus/Images",
     },
     "FMT": {
         "train": "data/FMT/Folds/train_gt_fold0.dat",
