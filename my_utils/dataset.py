@@ -36,7 +36,7 @@ class CTCDataset(Dataset):
 
         # Check and retrieve vocabulary
         vocab_name = "w2i.json"
-        vocab_folder = os.path.join(os.path.join("data", self.name.lower()), "vocab")
+        vocab_folder = os.path.join(os.path.join("data", self.name), "vocab")
         os.makedirs(vocab_folder, exist_ok=True)
         self.w2i_path = os.path.join(vocab_folder, vocab_name)
         self.w2i, self.i2w = self.check_and_retrieve_vocabulary(transcripts_folder)
@@ -53,7 +53,7 @@ class CTCDataset(Dataset):
         else:
             # CTC Training setting
             x = preprocess_image_from_file(self.X[idx])
-            y = preprocess_transcript_from_file(self.Y[idx])
+            y = preprocess_transcript_from_file(self.Y[idx], self.w2i)
 
             if self.train:
                 # x.shape = [channels, height, width]
