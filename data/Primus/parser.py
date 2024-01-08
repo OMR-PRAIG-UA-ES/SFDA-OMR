@@ -1,8 +1,10 @@
 import os
+import shutil
 import tarfile
+import requests
 from typing import List
 
-import requests
+import numpy as np
 from sklearn.model_selection import KFold, train_test_split
 
 
@@ -25,7 +27,9 @@ def download_and_extract_camera_primus_dataset():
 
 def create_kfolds(samples: List[str], folds_dir: str, k: int = 5):
     kf = KFold(n_splits=k, random_state=42, shuffle=True)
-    
+
+    samples = np.array(samples)
+
     i = 0
     for train_index, test_index in kf.split(samples):
         train_fold = os.path.join(folds_dir, f"train_gt_fold{i}.dat")
@@ -92,6 +96,21 @@ def format_camera_primus_dataset():
         folds_dir="data/Primus/Folds",
     )
 
+    # Delete Corpus dir and its contents
+    shutil.rmtree("Corpus")
+
+def change_separator():
+    # Music symbols consists of two terms: event durationg and pitch
+    # In the original dataset, the separator between these two terms is a "-"
+    # Changed to ":" to be consistent with the rest of datasets
+    for f in os.listdir("data/Primus/GT"):
+        if f.startswith("."):
+            continue
+        with open(os.path.join("data/Primus/GT", f), "r") as txt:
+            content = txt.read()
+        content = content.replace("-", ":")
+        with open(os.path.join("data/Primus/GT", f), "w") as txt:
+            txt.write(content)
 
 def create_camera_primus_dataset():
     # Check if Corpus dir exists
@@ -100,6 +119,8 @@ def create_camera_primus_dataset():
         download_and_extract_camera_primus_dataset()
     # Format dataset
     format_camera_primus_dataset()
+    # Change separator
+    change_separator()
 
 if __name__ == "__main__":
     create_camera_primus_dataset()
