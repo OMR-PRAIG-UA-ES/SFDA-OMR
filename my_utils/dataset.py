@@ -1,5 +1,6 @@
 import json
 import os
+import re
 
 import torch
 from torch.utils.data import Dataset
@@ -92,7 +93,7 @@ class CTCDataset(Dataset):
             if os.path.exists(img_path) and os.path.exists(transcript_path):
                 images.append(img_path)
                 with open(transcript_path, "r") as file:
-                    transcripts.append(file.read().strip().split())
+                    transcripts.append(re.split(r'\s+|:', file.read().strip()))
 
         return images, transcripts
 
@@ -111,12 +112,32 @@ class CTCDataset(Dataset):
 
         return w2i, i2w
 
-    def make_vocabulary(self, transcripts_dir):
+    def make_vocabulary_no_colon(self, transcripts_dir):
         vocab = set()  # Usamos un conjunto para evitar duplicados
         for transcript_file in os.listdir(transcripts_dir):
             with open(os.path.join(transcripts_dir, transcript_file), "r") as file:
                 # Dividir cada transcripción en palabras/tokens
                 words = file.read().strip().split()
+                # Añade las palabras al conjunto de vocabulario
+                vocab.update(words)
+        vocab = sorted(vocab)
+
+        w2i = {}
+        i2w = {}
+        for i, w in enumerate(vocab):
+            w2i[w] = i + 1
+            i2w[i + 1] = w
+        w2i["<PAD>"] = 0
+        i2w[0] = "<PAD>"
+
+        return w2i, i2w
+    
+    def make_vocabulary(self, transcripts_dir):
+        vocab = set()  # Usamos un conjunto para evitar duplicados
+        for transcript_file in os.listdir(transcripts_dir):
+            with open(os.path.join(transcripts_dir, transcript_file), "r") as file:
+                # Dividir cada transcripción en palabras/tokens usando espacios y ':'
+                words = re.split(r'\s+|:', file.read().strip())
                 # Añade las palabras al conjunto de vocabulario
                 vocab.update(words)
         vocab = sorted(vocab)

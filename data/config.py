@@ -21,6 +21,13 @@ DS_CONFIG = {
         "transcripts": "data/ILS/GT",
         "images": "data/ILS/Images",
     },
+    "ILS_colon": {
+        "train": "data/ILS/Folds/train_gt_fold0.dat",
+        "val": "data/ILS/Folds/val_gt_fold0.dat",
+        "test": "data/ILS/Folds/test_gt_fold0.dat",
+        "transcripts": "data/ILS/GT",
+        "images": "data/ILS/Images",
+    },
     "primens-Agr-Fry-Ock": {
         "train": "data/primens-Agr-Fry-Ock/Folds/train_gt_fold0.dat",
         "val": "data/primens-Agr-Fry-Ock/Folds/val_gt_fold0.dat",
