@@ -379,7 +379,8 @@ data/primens-agr-fry-ock
 data/primens-Agr-Fry-Ock
 Corpus
 data/Primus
-data/CameraPrimus
+data/Camera-Primus
+data/camera-primus
 
 # Logs
 *.logs
