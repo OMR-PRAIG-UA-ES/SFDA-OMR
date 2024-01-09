@@ -1,3 +1,4 @@
+import re
 import joblib
 
 import torch
@@ -27,10 +28,13 @@ def preprocess_image_from_file(path):
 
 ################################# Transcript preprocessing:
 
-
-def preprocess_transcript(y, w2i):
-    # Ex.: y = ["clef", "note", ...]
-    return [w2i[c] for c in y]
+@memory.cache
+def preprocess_transcript_from_file(path, w2i):
+    with open(path, "r") as file:
+        y = file.read().strip()
+    y = re.split(r'\s+|:', y) 
+    # Ex.: y = ["clef", "G2, "note.black", "L1" ...]
+    return torch.tensor([w2i[c] for c in y])
 
 
 ################################# CTC Preprocessing:

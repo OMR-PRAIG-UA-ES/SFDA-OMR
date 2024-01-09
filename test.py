@@ -38,9 +38,9 @@ def test(
         raise FileNotFoundError(f"Checkpoint path {checkpoint_path} does not exist")
 
     # Check if datasets exist
-    if not train_ds_name in DS_CONFIG.keys():
+    if train_ds_name not in DS_CONFIG.keys():
         raise NotImplementedError(f"Train dataset {train_ds_name} not implemented")
-    if not test_ds_name in DS_CONFIG.keys():
+    if test_ds_name not in DS_CONFIG.keys():
         raise NotImplementedError(f"Test dataset {test_ds_name} not implemented")
 
     # Experiment info
