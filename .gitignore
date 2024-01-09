@@ -365,6 +365,7 @@ data/synthetic_words_wiki/words
 
 # Data OMR
 data/b-59-850
+data/b-59-850_colon
 data/b-3-28
 data/camera-primus
 data/Camera-Primus
@@ -374,6 +375,7 @@ data/ils
 data/ils_colon
 data/ILS
 data/magnificat
+data/magnificat_colon
 data/Magnificat
 data/primens-agr-fry-ock
 data/primens-Agr-Fry-Ock
