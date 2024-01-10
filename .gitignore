@@ -365,22 +365,15 @@ data/synthetic_words_wiki/words
 
 # Data OMR
 data/b-59-850
-data/b-59-850_colon
-data/b-3-28
-data/fmt
 data/FMT
-data/ils
-data/ils_colon
 data/ILS
-data/magnificat
-data/magnificat_colon
 data/Magnificat
-data/primens-agr-fry-ock
-data/primens-Agr-Fry-Ock
+data/Malaga
+data/Mottecta
+data/Guatemala
 Corpus
 data/Primus
-data/Camera-Primus
-data/camera-primus
+data/CameraPrimus
 
 # Logs
 *.logs
