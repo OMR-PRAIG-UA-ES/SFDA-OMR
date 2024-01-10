@@ -83,7 +83,7 @@ def format_camera_primus_dataset():
                 # Move distorted image to data/CameraPrimus/Images
                 os.rename(
                     os.path.join("Corpus", sample_dir, f),
-                    os.path.join("data/CameraPrimus/Images", f),
+                    os.path.join("data/CameraPrimus/Images", f.replace("_distorted.jpg", ".jpg")),
                 )
 
     # Create folds
