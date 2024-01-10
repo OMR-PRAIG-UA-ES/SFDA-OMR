@@ -29,11 +29,16 @@ def preprocess_image_from_file(path):
 ################################# Transcript preprocessing:
 
 @memory.cache
-def preprocess_transcript_from_file(path, w2i):
+def preprocess_transcript_from_file(path, w2i, encoding_type="standard"):
     with open(path, "r") as file:
         y = file.read().strip()
-    y = re.split(r'\s+|:', y) 
-    # Ex.: y = ["clef", "G2, "note.black", "L1" ...]
+    if encoding_type == "standard":
+        # Ex.: y = ["clef:G2", "note.black:L1" ...]
+        y = y.split()
+    else:
+        # encoding_type == "split"
+        # Ex.: y = ["clef", "G2, "note.black", "L1" ...]
+        y = re.split(r'\s+|:', y) 
     return torch.tensor([w2i[c] for c in y])
 
 

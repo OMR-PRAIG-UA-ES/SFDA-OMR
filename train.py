@@ -26,6 +26,7 @@ torch.backends.cudnn.deterministic = True
 
 def train(
     ds_name,
+    encoding_type="standard",
     epochs=1000,
     patience=20,
     batch_size=16,
@@ -44,6 +45,7 @@ def train(
     # Experiment info
     print(f"Running experiment: {project} - {group}")
     print(f"\tDataset(s): {ds_name}")
+    print(f"\tEncoding type: {encoding_type}")
     print(f"\tAugmentations: {use_augmentations}")
     print(f"\tEpochs: {epochs}")
     print(f"\tPatience: {patience}")
@@ -55,6 +57,7 @@ def train(
         samples_filepath=DS_CONFIG[ds_name]["train"],
         transcripts_folder=DS_CONFIG[ds_name]["transcripts"],
         img_folder=DS_CONFIG[ds_name]["images"],
+        encoding_type=encoding_type,
     )
     train_loader = DataLoader(
         train_ds,
@@ -69,6 +72,7 @@ def train(
         transcripts_folder=DS_CONFIG[ds_name]["transcripts"],
         img_folder=DS_CONFIG[ds_name]["images"],
         train=False,
+        encoding_type=encoding_type,
     )
     val_loader = DataLoader(
         val_ds, batch_size=1, shuffle=False, num_workers=20
@@ -79,6 +83,7 @@ def train(
         transcripts_folder=DS_CONFIG[ds_name]["transcripts"],
         img_folder=DS_CONFIG[ds_name]["images"],
         train=False,
+        encoding_type=encoding_type,
     )
     test_loader = DataLoader(
         test_ds, batch_size=1, shuffle=False, num_workers=20
@@ -94,7 +99,7 @@ def train(
     callbacks = [
         ModelCheckpoint(
             dirpath=f"weights/{group}",
-            filename=ds_name,
+            filename=f"{ds_name}_{encoding_type}",
             monitor=metric_to_monitor,
             verbose=True,
             save_last=False,
@@ -121,7 +126,7 @@ def train(
         logger=WandbLogger(
             project=project,
             group=group,
-            name=f"Train-{ds_name}_Test-{ds_name}",
+            name=f"{encoding_type.upper()}-Train-{ds_name}_Test-{ds_name}",
             log_model=False,
         ),
         callbacks=callbacks,

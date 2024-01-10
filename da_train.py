@@ -36,6 +36,7 @@ def da_train(
     minimize_loss_weight,
     diversify_loss_weight,
     lr,
+    encoding_type="standard",
     epochs=1000,
     patience=20,
     batch_size=16,
@@ -62,6 +63,7 @@ def da_train(
     print(f"Running experiment: {project} - {group}")
     print(f"\tSource model ({train_ds_name}): {checkpoint_path}")
     print(f"\tTarget dataset: {test_ds_name}")
+    print(f"\tEncoding type: {encoding_type}")
     print(f"\tBN identifiers: {bn_ids}")
     print("\tLoss weights factors:")
     print(f"\t\talign_loss_weight={align_loss_weight}")
@@ -80,6 +82,7 @@ def da_train(
         img_folder=DS_CONFIG[test_ds_name]["images"],
         train=False,
         da_train=True,
+        encoding_type=encoding_type,
     )
     train_loader = DataLoader(
         train_ds,
@@ -94,6 +97,7 @@ def da_train(
         transcripts_folder=DS_CONFIG[test_ds_name]["transcripts"],
         img_folder=DS_CONFIG[test_ds_name]["images"],
         train=False,
+        encoding_type=encoding_type,
     )
     val_loader = DataLoader(
         val_ds, batch_size=1, shuffle=False, num_workers=20
@@ -104,6 +108,7 @@ def da_train(
         transcripts_folder=DS_CONFIG[test_ds_name]["transcripts"],
         img_folder=DS_CONFIG[test_ds_name]["images"],
         train=False,
+        encoding_type=encoding_type,
     )
     test_loader = DataLoader(
         test_ds, batch_size=1, shuffle=False, num_workers=20
@@ -114,7 +119,7 @@ def da_train(
     model = DATrainedCRNN(
         src_checkpoint_path=checkpoint_path, ytest_i2w=train_ds.i2w, bn_ids=bn_ids
     )
-    model_name = f"Train-{train_ds_name}_Test-{test_ds_name}"
+    model_name = f"{encoding_type.upper()}-Train-{train_ds_name}_Test-{test_ds_name}"
     model_name += f"_lr{lr}_bn{'-'.join([str(bn_id) for bn_id in bn_ids])}"
     model_name += (
         f"_a{align_loss_weight}_m{minimize_loss_weight}_d{diversify_loss_weight}"

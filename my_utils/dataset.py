@@ -23,11 +23,13 @@ class CTCDataset(Dataset):
         train=True,
         da_train=False,
         width_reduction=2,
+        encoding_type="standard", # Standard or split
     ):
         self.name = name
         self.train = train
         self.da_train = da_train
         self.width_reduction = width_reduction
+        self.encoding_type = encoding_type
 
         # Get image paths and transcripts
         self.X, self.Y = self.get_images_and_transcripts_filepaths(
@@ -35,7 +37,7 @@ class CTCDataset(Dataset):
         )
 
         # Check and retrieve vocabulary
-        vocab_name = "w2i.json"
+        vocab_name = f"w2i_{self.encoding_type}.json"
         vocab_folder = os.path.join(os.path.join("data", self.name), "vocab")
         os.makedirs(vocab_folder, exist_ok=True)
         self.w2i_path = os.path.join(vocab_folder, vocab_name)
@@ -53,7 +55,7 @@ class CTCDataset(Dataset):
         else:
             # CTC Training setting
             x = preprocess_image_from_file(self.X[idx])
-            y = preprocess_transcript_from_file(self.Y[idx], self.w2i)
+            y = preprocess_transcript_from_file(self.Y[idx], self.w2i, self.encoding_type)
 
             if self.train:
                 # x.shape = [channels, height, width]
@@ -108,9 +110,14 @@ class CTCDataset(Dataset):
         vocab = set()
         for transcript_file in os.listdir(transcripts_dir):
             with open(os.path.join(transcripts_dir, transcript_file), "r") as file:
-                # Split each transcript into words/tokens using spaces and ':'
-                # Ex.: y = ["clef", "G2, "note.black", "L1" ...]
-                words = re.split(r'\s+|:', file.read().strip())
+                if self.encoding_type == "standard":
+                    # Ex.: y = ["clef:G2", "note.black:L1" ...]
+                    words = file.read().strip().split()
+                else:
+                    # encoding_type == "split"
+                    # Split each transcript into words/tokens using spaces and ':'
+                    # Ex.: y = ["clef", "G2, "note.black", "L1" ...]
+                    words = re.split(r'\s+|:', file.read().strip())
                 vocab.update(words)
         vocab = sorted(vocab)
 

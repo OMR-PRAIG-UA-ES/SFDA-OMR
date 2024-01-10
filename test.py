@@ -27,6 +27,7 @@ def test(
     train_ds_name,
     test_ds_name,
     checkpoint_path,
+    encoding_type="standard",
     project="AMD-OMR",
     group="Baseline-LowerBound",
 ):
@@ -47,6 +48,7 @@ def test(
     print(f"Running experiment: {project} - {group}")
     print(f"\tTest dataset: {test_ds_name}")
     print(f"\tCheckpoint path ({train_ds_name}): {checkpoint_path}")
+    print(f"\tEncoding type: {encoding_type}")
 
     # Dataset
     test_ds = CTCDataset(
@@ -55,6 +57,7 @@ def test(
         transcripts_folder=DS_CONFIG[test_ds_name]["transcripts"],
         img_folder=DS_CONFIG[test_ds_name]["images"],
         train=False,
+        encoding_type=encoding_type,
     )
     test_loader = DataLoader(
         test_ds, batch_size=1, shuffle=False, num_workers=20
@@ -65,7 +68,7 @@ def test(
     model.freeze()
 
     # Test: automatically auto-loads the best weights from the previous run
-    run_name = f"Train-{train_ds_name}_Test-{test_ds_name}"
+    run_name = f"{encoding_type.upper()}-Train-{train_ds_name}_Test-{test_ds_name}"
     trainer = Trainer(
         logger=WandbLogger(
             project=project,

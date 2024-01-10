@@ -18,15 +18,16 @@ def get_group_runs(project_name="AMD-OMR", group_name="SCapitan-TILS"):
     names = [run.name for run in runs]
     return names
 
-def run_sweep(train_ds_name, test_ds_name, num_random_combinations=50):
+def run_sweep(train_ds_name, test_ds_name, encoding_type="standard", num_random_combinations=50):
     # Set WANDB API key
     os.environ["WANDB_API_KEY"] = input("Enter your WANDB API key: ")
 
     # Get runs
-    names = get_group_runs(group_name=f"S{train_ds_name}-T{test_ds_name}")
+    group_name = f"{encoding_type.upper()}-S{train_ds_name}-T{test_ds_name}"
+    names = get_group_runs(group_name=group_name)
     
     # Source checkpoint path
-    checkpoint_path = f"weights/Baseline-UpperBound/{train_ds_name}.ckpt"
+    checkpoint_path = f"weights/Baseline-UpperBound/{train_ds_name}_{encoding_type}.ckpt"
 
     # Sweep hyperparameters
     WEIGHT_FACTORS = [1, 5, 10, 25, 50]
@@ -48,7 +49,7 @@ def run_sweep(train_ds_name, test_ds_name, num_random_combinations=50):
         lr = random.choice(LRS)
 
         # Check if run exists
-        run_name = f"Train-{train_ds_name}_Test-{test_ds_name}"
+        run_name = f"{encoding_type.upper()}-Train-{train_ds_name}_Test-{test_ds_name}"
         run_name += f"_lr{lr}_bn{'-'.join(map(str, bn_ids))}_a{aw}_m{mw}_d{dw}"
         if run_name in names:
             continue
@@ -65,8 +66,9 @@ def run_sweep(train_ds_name, test_ds_name, num_random_combinations=50):
             minimize_loss_weight=mw,
             diversify_loss_weight=dw,
             lr=lr,
+            encoding_type=encoding_type,
             # Callbacks
-            group=f"S{train_ds_name}-T{test_ds_name}",
+            group=group_name,
             delete_checkpoint=True,
         )
         run_dir = wandb.run.dir
