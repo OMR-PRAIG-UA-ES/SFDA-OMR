@@ -28,8 +28,14 @@ def preprocess_image_from_file(path):
 
 ################################# Transcript preprocessing:
 
+
 @memory.cache
-def preprocess_transcript_from_file(path, w2i, encoding_type="standard"):
+def preprocess_transcript_from_file(
+    path,
+    w2i,
+    encoding_type="standard",
+    remove_stem_direction=False,
+):
     with open(path, "r") as file:
         y = file.read().strip()
     if encoding_type == "standard":
@@ -38,8 +44,11 @@ def preprocess_transcript_from_file(path, w2i, encoding_type="standard"):
     else:
         # encoding_type == "split"
         # Ex.: y = ["clef", "G2, "note.black", "L1" ...]
-        y = re.split(r'\s+|:', y) 
-    return torch.tensor([w2i[c] for c in y])
+        y = re.split(r"\s+|:", y)
+    if remove_stem_direction:
+        # Remove stem direction (up/down) from notes
+        y = [w.replace("_up", "").replace("_down", "") for w in y]
+    return torch.tensor([w2i[w] for w in y])
 
 
 ################################# CTC Preprocessing:

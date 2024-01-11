@@ -23,13 +23,17 @@ class CTCDataset(Dataset):
         train=True,
         da_train=False,
         width_reduction=2,
-        encoding_type="standard", # Standard or split
+        encoding_type="standard",  # Standard or split
     ):
         self.name = name
         self.train = train
         self.da_train = da_train
         self.width_reduction = width_reduction
         self.encoding_type = encoding_type
+
+        # Remove the appendix _up and _down from the notes in FMT and Malaga as
+        # Primus/CameraPrimus datasets do not have these appendixes
+        self.remove_stem_direction = True if self.name in ["FMT", "Malaga"] else False
 
         # Get image paths and transcripts
         self.X, self.Y = self.get_images_and_transcripts_filepaths(
@@ -55,7 +59,12 @@ class CTCDataset(Dataset):
         else:
             # CTC Training setting
             x = preprocess_image_from_file(self.X[idx])
-            y = preprocess_transcript_from_file(self.Y[idx], self.w2i, self.encoding_type)
+            y = preprocess_transcript_from_file(
+                self.Y[idx],
+                self.w2i,
+                self.encoding_type,
+                self.remove_stem_direction,
+            )
 
             if self.train:
                 # x.shape = [channels, height, width]
@@ -68,7 +77,7 @@ class CTCDataset(Dataset):
     ):
         images = []
         transcripts = []
-        
+
         # Images and transcripts are in different directories
         # Image filepath example: {image_name}.jpg
         # Transcript filepath example: {image_name}.jpg.txt
@@ -105,7 +114,7 @@ class CTCDataset(Dataset):
                 json.dump(w2i, file)
 
         return w2i, i2w
-    
+
     def make_vocabulary(self, transcripts_dir):
         vocab = set()
         for transcript_file in os.listdir(transcripts_dir):
@@ -117,9 +126,11 @@ class CTCDataset(Dataset):
                     # encoding_type == "split"
                     # Split each transcript into words/tokens using spaces and ':'
                     # Ex.: y = ["clef", "G2, "note.black", "L1" ...]
-                    words = re.split(r'\s+|:', file.read().strip())
+                    words = re.split(r"\s+|:", file.read().strip())
                 vocab.update(words)
         vocab = sorted(vocab)
+        if self.remove_stem_direction:
+            vocab = [w.replace("_up", "").replace("_down", "") for w in vocab]
 
         w2i = {}
         i2w = {}
