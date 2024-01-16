@@ -131,6 +131,7 @@ class CTCDataset(Dataset):
         vocab = sorted(vocab)
         if self.remove_stem_direction:
             vocab = [w.replace("_up", "").replace("_down", "") for w in vocab]
+            vocab = sorted(set(vocab))
 
         w2i = {}
         i2w = {}
