@@ -125,7 +125,7 @@ class CTCDataset(Dataset):
                 else:
                     # encoding_type == "split"
                     # Split each transcript into words/tokens using spaces and ':'
-                    # Ex.: y = ["clef", "G2, "note.black", "L1" ...]
+                    # Ex.: y = ["clef", "G2", "note.black", "L1" ...]
                     words = re.split(r"\s+|:", file.read().strip())
                 vocab.update(words)
         vocab = sorted(vocab)

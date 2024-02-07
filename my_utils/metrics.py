@@ -1,3 +1,4 @@
+import re
 import torch
 
 # -------------------------------------------- METRICS:
@@ -27,6 +28,9 @@ def compute_ser(y_true, y_pred):
     ed_acc = 0
     length_acc = 0
     for t, h in zip(y_true, y_pred):
+        # Convert to split-sequence encoding to ensure a fair comparison between both encodings
+        t = re.split(r"\s+|:", " ".join(t))
+        h = re.split(r"\s+|:", " ".join(h))
         ed_acc += levenshtein(t, h)
         length_acc += len(t)
     return 100.0 * ed_acc / length_acc
