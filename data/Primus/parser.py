@@ -87,14 +87,17 @@ def format_camera_primus_dataset():
                 )
 
     # Create folds
-    create_kfolds(
-        samples=[
-            f
-            for f in os.listdir("data/Primus/Images")
-            if f.endswith(".jpg") and not f.startswith(".")
-        ],
-        folds_dir="data/Primus/Folds",
-    )
+    if len(os.listdir("data/Primus/Folds")) == 0:
+        create_kfolds(
+            samples=[
+                f
+                for f in os.listdir("data/Primus/Images")
+                if f.endswith(".jpg") and not f.startswith(".")
+            ],
+            folds_dir="data/Primus/Folds",
+        )
+    else:
+        print("Folds already exist")
 
     # Delete Corpus dir and its contents
     shutil.rmtree("Corpus")
