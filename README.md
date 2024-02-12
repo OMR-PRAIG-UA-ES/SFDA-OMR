@@ -18,8 +18,8 @@
 <p align='center'>
   <!---<a href='#about'>About</a> •--->
   <a href='#how-to-use'>How To Use</a> •
-  <!---<a href='#citations'>Citations</a> •--->
-  <a href='#acknowledgments'>Acknowledgments</a> •
+  <!---<a href='#citations'>Citations</a> •
+  <a href='#acknowledgments'>Acknowledgments</a> •--->
   <a href='#license'>License</a>
 </p>
 
@@ -81,12 +81,13 @@ $ bash run_experiments.sh
   month     = {},
 }
 ```
---->
+
+
 
 ## Acknowledgments
 
 This work is part of the I+D+i PID2020-118447RA-I00 ([MultiScore](https://sites.google.com/view/multiscore-project)) project, funded by MCIN/AEI/10.13039/501100011033.
-
+--->
 ## License
 
 This work is under a [MIT](LICENSE) license.
