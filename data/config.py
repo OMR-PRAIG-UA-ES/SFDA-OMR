@@ -1,18 +1,11 @@
 DS_CONFIG = {
     # Mensural
-    "b-59-850": {   # AKA Capitan
+    "b-59-850": {  # AKA Capitan
         "train": "data/b-59-850/Folds/train_gt_fold0.dat",
         "val": "data/b-59-850/Folds/val_gt_fold0.dat",
         "test": "data/b-59-850/Folds/test_gt_fold0.dat",
         "transcripts": "data/b-59-850/GT",
         "images": "data/b-59-850/Images",
-    },
-    "Magnificat": {
-        "train": "data/Magnificat/Folds/train_gt_fold0.dat",
-        "val": "data/Magnificat/Folds/val_gt_fold0.dat",
-        "test": "data/Magnificat/Folds/test_gt_fold0.dat",
-        "transcripts": "data/Magnificat/GT",
-        "images": "data/Magnificat/Images",
     },
     "ILS": {
         "train": "data/ILS/Folds/train_gt_fold0.dat",
@@ -65,3 +58,5 @@ DS_CONFIG = {
         "images": "data/Malaga/Images",
     },
 }
+
+DATASETS = list(DS_CONFIG.keys())
