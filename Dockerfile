@@ -1,4 +1,4 @@
-FROM pytorch/pytorch:2.0.0-cuda11.7-cudnn8-devel
+FROM python:3.10
 
 RUN apt update --fix-missing
 RUN apt install build-essential -y
@@ -7,7 +7,6 @@ RUN apt install vim -y
 RUN apt clean
 
 RUN pip install --upgrade pip
-RUN pip install pybind11
 
 COPY requirements.txt ./
 
