@@ -2,11 +2,11 @@
 
 # - MENSURAL
 for encoding in standard split; do
-    for train_ds in b-59-850 ILS Magnificat Guatemala Mottecta; do
+    for train_ds in b-59-850 ILS Guatemala Mottecta; do
         python -u train.py --ds_name $train_ds --encoding_type $encoding
-        for test_ds in b-59-850 ILS Magnificat Guatemala Mottecta; do
+        for test_ds in b-59-850 ILS Guatemala Mottecta; do
             if [ $train_ds != $test_ds ]; then
-                python -u test.py --train_ds_name $train_ds --test_ds_name $test_ds --checkpoint_path weights/Baseline-UpperBound/$train_ds\_$encoding.ckpt --encoding_type $encoding
+                python -u test.py --train_ds_name $train_ds --test_ds_name $test_ds --checkpoint_path weights/Baseline-UpperBound/$train_ds\_$encoding.ckpt
                 python -u da_train_random_search.py --train_ds_name $train_ds --test_ds_name $test_ds --encoding_type $encoding --num_random_combinations 50
             fi
         done
@@ -24,7 +24,7 @@ for encoding in standard split; do
                 if [ $train_ds == CameraPrimus ] && [ $test_ds == Primus ]; then
                     continue
                 fi
-                python -u test.py --train_ds_name $train_ds --test_ds_name $test_ds --checkpoint_path weights/Baseline-UpperBound/$train_ds\_$encoding.ckpt --encoding_type $encoding
+                python -u test.py --train_ds_name $train_ds --test_ds_name $test_ds --checkpoint_path weights/Baseline-UpperBound/$train_ds\_$encoding.ckpt
                 python -u da_train_random_search.py --train_ds_name $train_ds --test_ds_name $test_ds --encoding_type $encoding --num_random_combinations 50
             fi
         done
