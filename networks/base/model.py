@@ -15,7 +15,9 @@ from my_utils.metrics import (
 
 
 class CTCTrainedCRNN(LightningModule):
-    def __init__(self, w2i: dict[str, int], i2w: dict[int, str]):
+    def __init__(
+        self, w2i: dict[str, int], i2w: dict[int, str], encoding_type: str = "standard"
+    ):
         super(CTCTrainedCRNN, self).__init__()
         # Save hyperparameters
         self.save_hyperparameters()
@@ -30,6 +32,8 @@ class CTCTrainedCRNN(LightningModule):
         self.compute_ctc_loss = CTCLoss(
             blank=self.blank_padding_token, zero_infinity=True
         )
+        # Encoding type
+        self.encoding_type = encoding_type
         # Predictions
         self.Y = []
         self.YHat = []

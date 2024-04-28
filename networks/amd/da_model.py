@@ -48,9 +48,8 @@ class DATrainedCRNN(CTCTrainedCRNN):
         self.w2i = deepcopy(src_model.w2i)
         self.i2w = deepcopy(src_model.i2w)
         self.blank_padding_token = self.w2i["<PAD>"]
-        # 5) Deep copy the CTC decoder
+        # 5) Deep copy the model encoding
         self.encoding_type = deepcopy(src_model.encoding_type)
-        self.ctc_decoder = deepcopy(src_model.ctc_decoder)
         # 6) Delete the source model
         for src_param, tgt_param in zip(
             src_model.model.parameters(), self.model.parameters()
