@@ -4,12 +4,10 @@
 
 <h1 align='center'>Source-Free Domain Adaptation for Optical Music Recognition</h1>
 
-<!---
 <h4 align='center'>Full text coming soon<a href='' target='_blank'></a>.</h4>
---->
 
 <p align='center'>
-  <img src='https://img.shields.io/badge/python-3.9.0-orange' alt='Python'>
+  <img src='https://img.shields.io/badge/python-3.10.0-orange' alt='Python'>
   <img src='https://img.shields.io/badge/PyTorch-%23EE4C2C.svg?style=flat&logo=PyTorch&logoColor=white' alt='PyTorch'>
   <img src='https://img.shields.io/badge/-Lightning-792ee5?logo=pytorchlightning&logoColor=white' alt='Lightning'>
   <img src='https://img.shields.io/static/v1?label=License&message=MIT&color=blue' alt='License'>
@@ -18,8 +16,8 @@
 <p align='center'>
   <!---<a href='#about'>About</a> •--->
   <a href='#how-to-use'>How To Use</a> •
-  <!---<a href='#citations'>Citations</a> •
-  <a href='#acknowledgments'>Acknowledgments</a> •--->
+  <a href='#citations'>Citations</a> •
+  <a href='#acknowledgments'>Acknowledgments</a> •
   <a href='#license'>License</a>
 </p>
 
@@ -67,27 +65,25 @@ $ bash run_experiments.sh
 ```
 
 
-<!---
 ## Citations
 
 ```bibtex
 @inproceedings{,
-  title     = {{}},
-  author    = {},
-  booktitle = {{}},
-  year      = {},
-  publisher = {},
-  address   = {},
-  month     = {},
+  title     = {{Source-Free Domain Adaptation for Optical Music Recognition}},
+  author    = {Rosell{\'\o}, Adri{\'\a}n and Fuentes-Mart{\'\i}nez, Eliseo and Alfaro-Contreras, Mar{\'\i}a and Rizo, David and Calvo-Zaragoza, Jorge},
+  booktitle = {{Proceedings of the 18th International Conference on Document Analysis and Recognition}},
+  year      = {2024},
+  publisher = {Springer},
+  address   = {Athens, Greece},
+  month     = {sep},
 }
 ```
 
-
-
 ## Acknowledgments
 
-This work is part of the I+D+i PID2020-118447RA-I00 ([MultiScore](https://sites.google.com/view/multiscore-project)) project, funded by MCIN/AEI/10.13039/501100011033.
---->
+This work is part of [REPERTORIUM](https://odratek.com/project/repertorium/) project, funded by the European Union’s Horizon Europe programme under grant agreement No 101095065.
+
+
 ## License
 
 This work is under a [MIT](LICENSE) license.
