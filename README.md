@@ -46,8 +46,8 @@ docker build --tag omr_amd:latest .
 - For mensural notation, we use *Capitan* (or b-59-850), *Il Lauro Secco*, *Magnificat*, *Mottecta*, and *Guatemala* datasets. These are private datasets and are available upon [request](mailto:malfaro@dlsi.ua.es). After obtaining these datasets, please place them in the [`data`](data) folder.
 - For modern notation, 
     - we use [*PrIMuS*](https://grfia.dlsi.ua.es/primus/) and [*CameraPrIMuS*](https://grfia.dlsi.ua.es/primus/) as the source datasets. Both of them are public. To obtain them and prepare them for later use, run the following script:
-        ```bash 
-        $ python -u data/Primus/parser.py
+        ```python
+        python -u data/Primus/parser.py
         ```
     - *AMDC* (or Malaga) and *FMT* are the target datasets. These are private datasets and are available upon [request](mailto:malfaro@dlsi.ua.es). After obtaining these datasets, please place them in the [`data`](data) folder. 
 
@@ -61,7 +61,7 @@ In the case of modern notation experiments, we only use PrIMuS (synthetic) and C
 We perform a random seach of 50 runs for each source-target combination and keep the best one as the final result. Execute the [`run_experiments.sh`](run_experiments.sh) script to replicate the experiments from our work:
 
 ```bash 
-$ bash run_experiments.sh
+bash run_experiments.sh
 ```
 
 
