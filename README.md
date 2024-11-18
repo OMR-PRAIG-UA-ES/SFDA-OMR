@@ -4,7 +4,7 @@
 
 <h1 align='center'>Source-Free Domain Adaptation for Optical Music Recognition</h1>
 
-<h4 align='center'>Full text coming soon<a href='' target='_blank'></a>.</h4>
+<h4 align='center'>Full text available <a href='https://link.springer.com/chapter/10.1007/978-3-031-70552-6_1' target='_blank'>here</a>.</h4>
 
 <p align='center'>
   <img src='https://img.shields.io/badge/python-3.10.0-orange' alt='Python'>
@@ -78,6 +78,7 @@ bash run_experiments.sh
   month     = {sep},
 }
 ```
+
 
 ## Acknowledgments
 
